@@ -14,8 +14,7 @@ public sealed class ProfilesConfig
     DefaultIgnoreCondition = JsonIgnoreCondition.Never,
   };
 
-  public static string CaminhoArquivo =>
-    Path.Combine(AppContext.BaseDirectory, "configs.json");
+  public static string CaminhoArquivo => CaminhoConfig.Arquivo;
 
   /// <summary>Motivo do último Carregar() ter voltado com instância vazia; null se carregou normalmente.</summary>
   public static string? UltimoErroCarregamento { get; private set; }
@@ -23,6 +22,7 @@ public sealed class ProfilesConfig
   public static ProfilesConfig Carregar()
   {
     UltimoErroCarregamento = null;
+    CaminhoConfig.MigrarSeNecessario();
 
     if (!File.Exists(CaminhoArquivo))
     {
@@ -44,6 +44,7 @@ public sealed class ProfilesConfig
 
   public void Salvar()
   {
+    Directory.CreateDirectory(CaminhoConfig.Pasta);
     var json = JsonSerializer.Serialize(this, JsonOpcoes);
     var tmp = CaminhoArquivo + ".tmp";
     File.WriteAllText(tmp, json);

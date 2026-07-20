@@ -28,6 +28,15 @@ public partial class MainForm : Form
   private Stopwatch _cronometro = new();
   private ProgressoBuild? _ultimoProgresso;
   private bool _emExecucao;
+  private bool _inicializado;
+
+  /// <summary>Dono a usar em ShowDialog/MessageBox: o próprio Form quando top-level,
+  /// ou o Form que o hospeda quando reparenteado (TopLevel=false) por um shell.</summary>
+  private IWin32Window Dono => (IWin32Window?)ParentForm ?? this;
+
+  /// <summary>True enquanto um pipeline de sincronização/build está em andamento — usado
+  /// pelo shell para recusar o fechamento da aba nesse estado.</summary>
+  public bool EmExecucao => _emExecucao;
 
   public MainForm()
   {
@@ -47,12 +56,19 @@ public partial class MainForm : Form
     tvOrdem.AfterSelect += (_, e) => AoSelecionarNoDaArvore(e.Node);
     menuRegenerarBuildAllSln.Click += (_, _) => RegenerarBuildAllSln();
     timerProgresso.Tick += (_, _) => AtualizarLabelProgresso();
+    FormClosing += AoFechar;
 
-    Shown += (_, _) => CarregarConfiguracaoInicial();
+    // Em uso standalone (top-level) o Shown garante a inicialização após o handle da janela
+    // existir. Sob um shell que reparenta este Form (TopLevel=false), o adaptador chama
+    // Inicializar() explicitamente logo após hospedar — por isso o guard de idempotência.
+    Shown += (_, _) => Inicializar();
   }
 
-  private void CarregarConfiguracaoInicial()
+  public void Inicializar()
   {
+    if (_inicializado) return;
+    _inicializado = true;
+
     _config = ProfilesConfig.Carregar();
     if (_config.Perfis.Count == 0)
     {
@@ -60,6 +76,23 @@ public partial class MainForm : Form
       return;
     }
     CarregarPerfisNoCombo();
+  }
+
+  private void AoFechar(object? sender, FormClosingEventArgs e)
+  {
+    if (!_emExecucao) return;
+
+    var resultado = MessageBox.Show(Dono,
+      "Uma execução está em andamento. Cancelar e fechar mesmo assim?",
+      "GitSubmoduleSync", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+    if (resultado != DialogResult.Yes)
+    {
+      e.Cancel = true;
+      return;
+    }
+
+    _cts?.Cancel();
   }
 
   private void CarregarPerfisNoCombo()
@@ -117,7 +150,7 @@ public partial class MainForm : Form
   private void AbrirConfiguracoes()
   {
     using var form = new ConfigForm(_config);
-    form.ShowDialog(this);
+    form.ShowDialog(Dono);
     _config = ProfilesConfig.Carregar();
     CarregarPerfisNoCombo();
     AtualizarTelaParaPerfilAtual();
@@ -527,7 +560,7 @@ public partial class MainForm : Form
     if (_perfil is null) return;
     if (_ultimoGrafo is null)
     {
-      MessageBox.Show(this, "Execute o build ao menos uma vez antes de gerar o BuildAll.sln.", "GitSubmoduleSync",
+      MessageBox.Show(Dono, "Execute o build ao menos uma vez antes de gerar o BuildAll.sln.", "GitSubmoduleSync",
         MessageBoxButtons.OK, MessageBoxIcon.Information);
       return;
     }
@@ -535,12 +568,12 @@ public partial class MainForm : Form
     try
     {
       _buildAllSln.Regenerar(_ultimoGrafo, _perfil.PastaRaiz);
-      MessageBox.Show(this, "BuildAll.sln regenerado com sucesso.", "GitSubmoduleSync",
+      MessageBox.Show(Dono, "BuildAll.sln regenerado com sucesso.", "GitSubmoduleSync",
         MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
     catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
     {
-      MessageBox.Show(this, $"Falha ao gerar o BuildAll.sln: {ex.Message}", "GitSubmoduleSync",
+      MessageBox.Show(Dono, $"Falha ao gerar o BuildAll.sln: {ex.Message}", "GitSubmoduleSync",
         MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
   }

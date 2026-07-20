@@ -12,4 +12,10 @@
     <ProjectReference Include="..\GitSubmoduleSync.Models\GitSubmoduleSync.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- ApplicationIcon só é embutido no apphost; para o shell (apps-cm) conseguir carregar este
+         ícone em runtime (aba/menu), ele também precisa existir como arquivo solto na saída -->
+    <None Include="favicon.ico" Link="Icone\GitSubmoduleSync.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
