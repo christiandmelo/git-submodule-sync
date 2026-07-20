@@ -19,6 +19,11 @@ public partial class ConfigForm : Form
   private SyncProfile? _perfilAtual;
   private bool _carregandoCampos;
 
+  /// <summary>Somente para o WinForms Designer — exige um construtor sem parâmetros para instanciar em tempo de design.</summary>
+  public ConfigForm() : this(new ProfilesConfig())
+  {
+  }
+
   public ConfigForm(ProfilesConfig config)
   {
     InitializeComponent();
