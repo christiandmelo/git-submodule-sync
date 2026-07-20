@@ -35,8 +35,10 @@ partial class MainForm
   private System.Windows.Forms.Button btnCancelar;
 
   private System.Windows.Forms.Panel painelProgresso;
-  private System.Windows.Forms.Label lblProgresso;
-  private System.Windows.Forms.ProgressBar progressBar;
+  private System.Windows.Forms.Label lblProgressoGit;
+  private System.Windows.Forms.ProgressBar progressBarGit;
+  private System.Windows.Forms.Label lblProgressoBuild;
+  private System.Windows.Forms.ProgressBar progressBarBuild;
 
   private System.Windows.Forms.TabControl tabControl;
   private System.Windows.Forms.TabPage tabLog;
@@ -76,8 +78,10 @@ partial class MainForm
     btnSoSincronizar = new Button();
     btnExecutarTudo = new Button();
     painelProgresso = new Panel();
-    progressBar = new ProgressBar();
-    lblProgresso = new Label();
+    progressBarGit = new ProgressBar();
+    lblProgressoGit = new Label();
+    progressBarBuild = new ProgressBar();
+    lblProgressoBuild = new Label();
     tabControl = new TabControl();
     tabLog = new TabPage();
     rtbLog = new RichTextBox();
@@ -267,34 +271,53 @@ partial class MainForm
     btnExecutarTudo.TabIndex = 0;
     btnExecutarTudo.Text = "Executar tudo";
     btnExecutarTudo.UseVisualStyleBackColor = true;
-    // 
+    //
     // painelProgresso
-    // 
-    painelProgresso.Controls.Add(progressBar);
-    painelProgresso.Controls.Add(lblProgresso);
+    //
+    painelProgresso.Controls.Add(progressBarBuild);
+    painelProgresso.Controls.Add(lblProgressoBuild);
+    painelProgresso.Controls.Add(progressBarGit);
+    painelProgresso.Controls.Add(lblProgressoGit);
     painelProgresso.Dock = DockStyle.Top;
     painelProgresso.Location = new Point(0, 204);
     painelProgresso.Margin = new Padding(3, 4, 3, 4);
     painelProgresso.Name = "painelProgresso";
-    painelProgresso.Size = new Size(1437, 53);
+    painelProgresso.Size = new Size(1437, 97);
     painelProgresso.TabIndex = 3;
-    // 
-    // progressBar
-    // 
-    progressBar.Location = new Point(14, 27);
-    progressBar.Margin = new Padding(3, 4, 3, 4);
-    progressBar.Name = "progressBar";
-    progressBar.Size = new Size(1411, 19);
-    progressBar.TabIndex = 1;
-    // 
-    // lblProgresso
-    // 
-    lblProgresso.AutoSize = true;
-    lblProgresso.Location = new Point(14, 5);
-    lblProgresso.Name = "lblProgresso";
-    lblProgresso.Size = new Size(56, 20);
-    lblProgresso.TabIndex = 0;
-    lblProgresso.Text = "Pronto.";
+    //
+    // lblProgressoGit
+    //
+    lblProgressoGit.AutoSize = true;
+    lblProgressoGit.Location = new Point(14, 5);
+    lblProgressoGit.Name = "lblProgressoGit";
+    lblProgressoGit.Size = new Size(56, 20);
+    lblProgressoGit.TabIndex = 0;
+    lblProgressoGit.Text = "Git: pronto.";
+    //
+    // progressBarGit
+    //
+    progressBarGit.Location = new Point(14, 27);
+    progressBarGit.Margin = new Padding(3, 4, 3, 4);
+    progressBarGit.Name = "progressBarGit";
+    progressBarGit.Size = new Size(1411, 19);
+    progressBarGit.TabIndex = 1;
+    //
+    // lblProgressoBuild
+    //
+    lblProgressoBuild.AutoSize = true;
+    lblProgressoBuild.Location = new Point(14, 51);
+    lblProgressoBuild.Name = "lblProgressoBuild";
+    lblProgressoBuild.Size = new Size(56, 20);
+    lblProgressoBuild.TabIndex = 2;
+    lblProgressoBuild.Text = "Build: pronto.";
+    //
+    // progressBarBuild
+    //
+    progressBarBuild.Location = new Point(14, 73);
+    progressBarBuild.Margin = new Padding(3, 4, 3, 4);
+    progressBarBuild.Name = "progressBarBuild";
+    progressBarBuild.Size = new Size(1411, 19);
+    progressBarBuild.TabIndex = 3;
     // 
     // tabControl
     // 
@@ -303,11 +326,11 @@ partial class MainForm
     tabControl.Controls.Add(tabOrdem);
     tabControl.Controls.Add(tabResumo);
     tabControl.Dock = DockStyle.Fill;
-    tabControl.Location = new Point(0, 257);
+    tabControl.Location = new Point(0, 301);
     tabControl.Margin = new Padding(3, 4, 3, 4);
     tabControl.Name = "tabControl";
     tabControl.SelectedIndex = 0;
-    tabControl.Size = new Size(1437, 543);
+    tabControl.Size = new Size(1437, 499);
     tabControl.TabIndex = 4;
     // 
     // tabLog

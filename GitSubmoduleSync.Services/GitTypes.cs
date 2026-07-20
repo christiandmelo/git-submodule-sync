@@ -11,3 +11,5 @@ public sealed record BranchResolution(
 
 public sealed record ResultadoSubmodulo(
   string Submodulo, StatusSubmodulo Status, string? BranchResolvida, string? Detalhe);
+
+public sealed record ProgressoGit(int Concluidos, int Total);

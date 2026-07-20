@@ -52,7 +52,7 @@ public sealed class GitService
   }
 
   public async Task<IReadOnlyList<ResultadoSubmodulo>> SincronizarAsync(
-    SyncProfile perfil, IProgress<LogEvent> log, CancellationToken ct)
+    SyncProfile perfil, IProgress<LogEvent> log, CancellationToken ct, IProgress<ProgressoGit>? progresso = null)
   {
     var todos = await DescobrirAsync(perfil.PastaRaiz, ct);
     var alvo = todos
@@ -60,6 +60,10 @@ public sealed class GitService
       .ToList();
 
     using var semaforo = new SemaphoreSlim(perfil.GrauParalelismoGit > 0 ? perfil.GrauParalelismoGit : 4);
+
+    var concluidos = 0;
+    var total = alvo.Count;
+    progresso?.Report(new ProgressoGit(0, total));
 
     var tarefas = alvo.Select(async sub =>
     {
@@ -71,6 +75,8 @@ public sealed class GitService
       finally
       {
         semaforo.Release();
+        var c = Interlocked.Increment(ref concluidos);
+        progresso?.Report(new ProgressoGit(c, total));
       }
     });
 

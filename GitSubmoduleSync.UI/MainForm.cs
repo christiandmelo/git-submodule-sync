@@ -137,7 +137,8 @@ public partial class MainForm : Form
     if (_perfil is null || _emExecucao) return;
 
     var progressoLog = new Progress<LogEvent>(AoReceberLog);
-    var progressoBuild = new Progress<ProgressoBuild>(AoReceberProgresso);
+    var progressoGit = new Progress<ProgressoGit>(AoReceberProgressoGit);
+    var progressoBuild = new Progress<ProgressoBuild>(AoReceberProgressoBuild);
 
     _emExecucao = true;
     HabilitarAcoes(false);
@@ -166,7 +167,7 @@ public partial class MainForm : Form
         }
 
         var swGit = Stopwatch.StartNew();
-        var resultadosGit = await _gitService.SincronizarAsync(_perfil, progressoLog, ct);
+        var resultadosGit = await _gitService.SincronizarAsync(_perfil, progressoLog, ct, progressoGit);
         swGit.Stop();
         var semErro = resultadosGit.Count(r => r.Status == StatusSubmodulo.Erro) == 0;
         etapas.Add(new ResultadoEtapa($"Sincronização ({resultadosGit.Count} submódulos)", semErro, swGit.Elapsed));
@@ -247,9 +248,11 @@ public partial class MainForm : Form
     lblDependencias.Text = "";
     txtResumo.Clear();
     _logCompleto.Clear();
-    progressBar.Value = 0;
+    progressBarGit.Value = 0;
+    progressBarBuild.Value = 0;
     _ultimoProgresso = null;
-    lblProgresso.Text = "Executando…";
+    lblProgressoGit.Text = "Git: aguardando…";
+    lblProgressoBuild.Text = "Build: aguardando…";
   }
 
   // ==================== Log ====================
@@ -337,11 +340,20 @@ public partial class MainForm : Form
 
   // ==================== Progresso ====================
 
-  private void AoReceberProgresso(ProgressoBuild p)
+  private void AoReceberProgressoGit(ProgressoGit p)
+  {
+    progressBarGit.Maximum = Math.Max(p.Total, 1);
+    progressBarGit.Value = Math.Min(p.Concluidos, p.Total);
+    lblProgressoGit.Text = p.Concluidos >= p.Total && p.Total > 0
+      ? $"Git: {p.Concluidos}/{p.Total} submódulos concluído."
+      : $"Git: sincronizando {p.Concluidos}/{p.Total} submódulos…";
+  }
+
+  private void AoReceberProgressoBuild(ProgressoBuild p)
   {
     _ultimoProgresso = p;
-    progressBar.Maximum = Math.Max(p.Total, 1);
-    progressBar.Value = Math.Min(p.Concluidos, p.Total);
+    progressBarBuild.Maximum = Math.Max(p.Total, 1);
+    progressBarBuild.Value = Math.Min(p.Concluidos, p.Total);
     AtualizarLabelProgresso();
   }
 
@@ -349,11 +361,11 @@ public partial class MainForm : Form
   {
     if (_ultimoProgresso is { } p)
     {
-      lblProgresso.Text = $"Onda {p.OndaAtual} de {p.TotalOndas}  ·  {p.Concluidos}/{p.Total} projetos  ·  {_cronometro.Elapsed:mm\\:ss} decorrido";
+      lblProgressoBuild.Text = $"Build: onda {p.OndaAtual} de {p.TotalOndas}  ·  {p.Concluidos}/{p.Total} projetos  ·  {_cronometro.Elapsed:mm\\:ss} decorrido";
     }
     else if (_emExecucao)
     {
-      lblProgresso.Text = $"Executando…  ·  {_cronometro.Elapsed:mm\\:ss} decorrido";
+      lblProgressoBuild.Text = $"Build: aguardando…  ·  {_cronometro.Elapsed:mm\\:ss} decorrido";
     }
   }
 
