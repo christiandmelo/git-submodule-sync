@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GitSubmoduleSync.Services\GitSubmoduleSync.Services.csproj" />
+    <ProjectReference Include="..\GitSubmoduleSync.Models\GitSubmoduleSync.Models.csproj" />
+  </ItemGroup>
+
+</Project>
