@@ -12,6 +12,7 @@ public partial class PromptForm : Form
   public PromptForm(string titulo, string rotulo, string valorInicial = "")
   {
     InitializeComponent();
+    Icon = IconeApp.Obter();
     Text = titulo;
     lblRotulo.Text = rotulo;
     txtValor.Text = valorInicial;

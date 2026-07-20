@@ -9,11 +9,9 @@ public partial class ConfigForm : Form
   private const int ColSubmodulo = 0;
   private const int ColBranch = 1;
   private const int ColOrigem = 2;
-  private const int ColEscolher = 3;
 
   private readonly ProfilesConfig _configOriginal;
   private readonly GitService _gitService = new();
-  private readonly BranchResolver _branchResolver = new();
 
   private List<SyncProfile> _perfis;
   private SyncProfile? _perfilAtual;
@@ -27,6 +25,7 @@ public partial class ConfigForm : Form
   public ConfigForm(ProfilesConfig config)
   {
     InitializeComponent();
+    Icon = IconeApp.Obter();
     _configOriginal = config;
 
     var json = JsonSerializer.Serialize(config.Perfis);
@@ -204,10 +203,8 @@ public partial class ConfigForm : Form
     grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "colSubmodulo", HeaderText = "Projeto", ReadOnly = true });
     grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "colBranch", HeaderText = "Branch" });
     grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "colOrigem", HeaderText = "Origem", ReadOnly = true, FillWeight = 60 });
-    grid.Columns.Add(new DataGridViewButtonColumn { Name = "colEscolher", HeaderText = "", Text = "▾", UseColumnTextForButtonValue = true, FillWeight = 30 });
 
     grid.CellEndEdit += Grid_CellEndEdit;
-    grid.CellClick += Grid_CellClick;
   }
 
   private void PopularGrid()
@@ -249,53 +246,6 @@ public partial class ConfigForm : Form
   }
 
   // Branch é sempre um campo de texto livre (branch ainda não publicada é um caso válido).
-  // O botão "▾" é a lista sob demanda: só bate no remoto quando clicado, nunca ao abrir a tela.
-  private readonly Dictionary<string, IReadOnlyList<string>> _branchesCarregadas = new(StringComparer.OrdinalIgnoreCase);
-
-  private void Grid_CellClick(object? sender, DataGridViewCellEventArgs e)
-  {
-    if (e.RowIndex < 0 || e.ColumnIndex != ColEscolher) return;
-
-    var linha = grid.Rows[e.RowIndex];
-    var submodulo = (string)linha.Cells[ColSubmodulo].Value!;
-    var caminho = Path.Combine(txtPastaRaiz.Text.Trim(), submodulo);
-    if (!Directory.Exists(caminho)) return;
-
-    if (!_branchesCarregadas.TryGetValue(submodulo, out var branches))
-    {
-      try
-      {
-        Cursor.Current = Cursors.WaitCursor;
-        branches = _branchResolver.ListarBranchesAsync(caminho, CancellationToken.None).GetAwaiter().GetResult();
-        _branchesCarregadas[submodulo] = branches;
-      }
-      catch (Exception ex) when (ex is InvalidOperationException or IOException)
-      {
-        MessageBox.Show(this, "Não foi possível consultar as branches remotas.", "GitSubmoduleSync", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        return;
-      }
-      finally
-      {
-        Cursor.Current = Cursors.Default;
-      }
-    }
-
-    if (branches.Count == 0) return;
-
-    var menu = new ContextMenuStrip();
-    foreach (var b in branches)
-    {
-      var item = b;
-      menu.Items.Add(item, null, (_, _) =>
-      {
-        linha.Cells[ColBranch].Value = item;
-        Grid_CellEndEdit(this, new DataGridViewCellEventArgs(ColBranch, e.RowIndex));
-      });
-    }
-
-    var celula = grid.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
-    menu.Show(grid, new Point(celula.Left, celula.Bottom));
-  }
 
   private void Grid_CellEndEdit(object? sender, DataGridViewCellEventArgs e)
   {
@@ -334,14 +284,19 @@ public partial class ConfigForm : Form
       return;
     }
 
+    var textoOriginal = btnLerProjetos.Text;
     IReadOnlyList<SubmoduloInfo> descobertos;
     try
     {
+      btnLerProjetos.Enabled = false;
+      btnLerProjetos.Text = "Lendo…";
       Cursor.Current = Cursors.WaitCursor;
       descobertos = await _gitService.DescobrirAsync(pastaRaiz, CancellationToken.None);
     }
     finally
     {
+      btnLerProjetos.Enabled = true;
+      btnLerProjetos.Text = textoOriginal;
       Cursor.Current = Cursors.Default;
     }
 

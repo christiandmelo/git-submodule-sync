@@ -171,7 +171,7 @@ partial class MainForm
     // lblBinCustom
     // 
     lblBinCustom.AutoSize = true;
-    lblBinCustom.Location = new Point(17, 69);
+    lblBinCustom.Location = new Point(14, 69);
     lblBinCustom.Name = "lblBinCustom";
     lblBinCustom.Size = new Size(108, 20);
     lblBinCustom.TabIndex = 4;
@@ -465,6 +465,7 @@ partial class MainForm
     Margin = new Padding(3, 4, 3, 4);
     MinimumSize = new Size(797, 584);
     Name = "MainForm";
+    StartPosition = FormStartPosition.CenterScreen;
     Text = "GitSubmoduleSync";
     menuStrip.ResumeLayout(false);
     menuStrip.PerformLayout();

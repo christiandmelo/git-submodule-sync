@@ -32,6 +32,7 @@ public partial class MainForm : Form
   public MainForm()
   {
     InitializeComponent();
+    Icon = IconeApp.Obter();
 
     lvErros.ListViewItemSorter = new ErroPorOndaEProjetoComparer();
 
