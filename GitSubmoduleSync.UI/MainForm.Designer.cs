@@ -33,6 +33,7 @@ partial class MainForm
   private System.Windows.Forms.Button btnSoSincronizar;
   private System.Windows.Forms.Button btnSoCompilar;
   private System.Windows.Forms.Button btnCancelar;
+  private System.Windows.Forms.Label lblCronometro;
 
   private System.Windows.Forms.Panel painelProgresso;
   private System.Windows.Forms.Label lblProgressoGit;
@@ -73,6 +74,7 @@ partial class MainForm
     btnConfiguracoes = new Button();
     cboPerfil = new ComboBox();
     painelBotoes = new Panel();
+    lblCronometro = new Label();
     btnCancelar = new Button();
     btnSoCompilar = new Button();
     btnSoSincronizar = new Button();
@@ -220,6 +222,7 @@ partial class MainForm
     // 
     // painelBotoes
     // 
+    painelBotoes.Controls.Add(lblCronometro);
     painelBotoes.Controls.Add(btnCancelar);
     painelBotoes.Controls.Add(btnSoCompilar);
     painelBotoes.Controls.Add(btnSoSincronizar);
@@ -241,7 +244,16 @@ partial class MainForm
     btnCancelar.TabIndex = 3;
     btnCancelar.Text = "■";
     btnCancelar.UseVisualStyleBackColor = true;
-    // 
+    //
+    // lblCronometro
+    //
+    lblCronometro.AutoSize = true;
+    lblCronometro.Location = new Point(504, 17);
+    lblCronometro.Name = "lblCronometro";
+    lblCronometro.Size = new Size(56, 20);
+    lblCronometro.TabIndex = 4;
+    lblCronometro.Text = "";
+    //
     // btnSoCompilar
     // 
     btnSoCompilar.Location = new Point(302, 7);

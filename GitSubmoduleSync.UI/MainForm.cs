@@ -253,6 +253,7 @@ public partial class MainForm : Form
     _ultimoProgresso = null;
     lblProgressoGit.Text = "Git: aguardando…";
     lblProgressoBuild.Text = "Build: aguardando…";
+    lblCronometro.Text = "";
   }
 
   // ==================== Log ====================
@@ -359,13 +360,15 @@ public partial class MainForm : Form
 
   private void AtualizarLabelProgresso()
   {
+    lblCronometro.Text = _emExecucao ? $"{_cronometro.Elapsed:mm\\:ss}" : "";
+
     if (_ultimoProgresso is { } p)
     {
-      lblProgressoBuild.Text = $"Build: onda {p.OndaAtual} de {p.TotalOndas}  ·  {p.Concluidos}/{p.Total} projetos  ·  {_cronometro.Elapsed:mm\\:ss} decorrido";
+      lblProgressoBuild.Text = $"Build: onda {p.OndaAtual} de {p.TotalOndas}  ·  {p.Concluidos}/{p.Total} projetos";
     }
     else if (_emExecucao)
     {
-      lblProgressoBuild.Text = $"Build: aguardando…  ·  {_cronometro.Elapsed:mm\\:ss} decorrido";
+      lblProgressoBuild.Text = "Build: aguardando…";
     }
   }
 
